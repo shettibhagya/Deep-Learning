@@ -10,7 +10,7 @@ To check the working of our model, you can follow the steps below;<br/>
 2.Intall the requirements (TensorFlow - CPU)<br/>
   pip install -r requirements.txt<br/>
 3.Download the pre-trained weights and save it in weights folder.<br/>
-  wget https://pjreddie.com/media/files/yolov3.weights -O data/yolov3.weights<br/>
+  wget https://pjreddie.com/media/files/yolov3.weights <br/>
 4.To save YOLOv3 weights in TensorFlow format, run<br/>
   python load_weights.py<br/>
 5.Running the model on images and videos.<br/>
