@@ -3,4 +3,18 @@ Object detection is an important and challenging ﬁeld in computer vision, one 
 
 This repository implements Yolov3 using TensorFlow 2.0
 
-# Implementation
+# Installation
+To check the working of our model, you can follow the steps below;
+1.Clone repository.
+  git clone https://github.com/shettibhagya/Deep-Learning.git
+2.Intall the requirements (TensorFlow - CPU)
+  pip install -r requirements.txt
+3.Download the pre-trained weights and save it in weights folder.
+  wget https://pjreddie.com/media/files/yolov3.weights -O data/yolov3.weights
+4.To save YOLOv3 weights in TensorFlow format, run
+  python load_weights.py
+5.Running the model on images and videos.
+  python detect.py 
+  python detect_video.py
+  
+YOLOv3_on_colab.ipynb implements the above installation steps.
