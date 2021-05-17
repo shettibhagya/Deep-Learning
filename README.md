@@ -3,6 +3,12 @@ Object detection is an important and challenging ﬁeld in computer vision, one 
 
 This repository implements Yolov3 using TensorFlow 2.0
 
+# Description of Dataset:
+A labeled dataset is needed to train the YOLOv3 algorithm. We will use the COCO dataset which consists of 80 labels. The COCO dataset is a large scale object detection, segmentation, and captioning dataset that has 330k images ( >200k labeled), 1.5 million object instances,  80 object categories, 91 stuff categories, 5 captions per image and 250,000 people with key points. The pre-trained weights of  with the COCO dataset are uploaded as initial weights for the model.
+
+#  Description of Model:
+“You Only Look Once” is an algorithm that uses convolutional neural networks for object detection. In comparison to recognition algorithms, a detection algorithm does not only predict class labels but detects locations of objects as well. So, it not only classifies the image into a category, but it can also detect multiple objects within an Image. This algorithm applies a single neural network to the full image. It means that this network divides the image into regions/grids and predicts bounding boxes and probabilities for each region. These bounding boxes are weighted by the predicted probabilities.
+
 # Installation
 To check the working of our model, you can follow the steps below;<br/>
 1.Clone repository. <br/>
@@ -18,3 +24,10 @@ To check the working of our model, you can follow the steps below;<br/>
   python detect_video.py<br/>
   
 YOLOv3_on_colab.ipynb implements the above installation steps.
+
+# Results
+![image](https://user-images.githubusercontent.com/75746037/118541741-10957980-b720-11eb-9f5e-811de6d552dd.png)
+![image](https://user-images.githubusercontent.com/75746037/118541777-1a1ee180-b720-11eb-89d8-31eb2dcf1541.png)
+
+
+5.Running the model on images and videos.<br/>
