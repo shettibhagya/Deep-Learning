@@ -14,6 +14,7 @@ YOLOv3 presents a deeper architecture of feature extractor called Darknet-53. It
 
 # Installation
 The folder YOLOv3 contains the code for model implementation. To check the working of our model, you can follow the steps below;<br/>
+<br/>
 1.Clone repository. <br/>
   git clone https://github.com/shettibhagya/Deep-Learning.git<br/>
 2.Intall the requirements (TensorFlow - CPU)<br/>
