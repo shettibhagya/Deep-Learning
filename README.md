@@ -16,14 +16,14 @@ YOLOv3 presents a deeper architecture of feature extractor called Darknet-53. It
 The folder YOLOv3 contains the code for model implementation. To check the working of our model, you can follow the steps below;<br/>
 <br/>
 1.Clone repository. <br/>
-  git clone https://github.com/shettibhagya/Deep-Learning.git<br/>
+  git clone https://github.com/shettibhagya/Deep-Learning.git<br/> <br/>
 2.Intall the requirements (TensorFlow - CPU)<br/>
-  pip install -r requirements.txt<br/>
+  pip install -r requirements.txt<br/> <br/>
 3.Download the pre-trained weights and save it in weights folder.<br/>
-  wget https://pjreddie.com/media/files/yolov3.weights <br/>
+  wget https://pjreddie.com/media/files/yolov3.weights <br/> <br/>
 4.To save YOLOv3 weights in TensorFlow format, run<br/>
-  python load_weights.py<br/>
-5.Running the model on images and videos.<br/>
+  python load_weights.py<br/> <br/>
+5.Finally run the model on images and videos.<br/>
   python detect.py <br/>
   python detect_video.py<br/>
   
