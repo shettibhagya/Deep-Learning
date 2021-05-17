@@ -5,7 +5,7 @@ This repository implements Yolov3 using TensorFlow 2.0
 
 # Installation
 To check the working of our model, you can follow the steps below;
-1.Clone repository.
+1.Clone repository. <br/>
   git clone https://github.com/shettibhagya/Deep-Learning.git
 2.Intall the requirements (TensorFlow - CPU)
   pip install -r requirements.txt
