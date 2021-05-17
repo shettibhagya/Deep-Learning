@@ -29,5 +29,6 @@ YOLOv3_on_colab.ipynb implements the above installation steps.
 ![image](https://user-images.githubusercontent.com/75746037/118541741-10957980-b720-11eb-9f5e-811de6d552dd.png)
 ![image](https://user-images.githubusercontent.com/75746037/118541777-1a1ee180-b720-11eb-89d8-31eb2dcf1541.png)
 
+# Conclusion
+We constructed and compiled  model in TensorFlow and Keras. We transferred weights from original Darknet weights to constructed model and then tested the model to make predictions on images and videos. All the image and video predictions are uploaded in detections folder repository. It takes approximately 70ms for detection using  on Windows. Predictions at different scales or aspect ratios for same objects improved because of the addition of feature pyramid like method. Our model is fast and accurate and this makes it the best model to choose in applications where speed is important either because the objects need to be real-time or the data is just too big.
 
-5.Running the model on images and videos.<br/>
