@@ -71,7 +71,7 @@ def transform_images(x_train, size):
     x_train = tf.image.resize(x_train, (size, size)) / 255
     return x_train
 
-IMAGE_FEATURE_MAP = {
+feature_map = {
     'image/encoded': tf.io.FixedLenFeature([], tf.string),
     'image/object/bbox/xmin': tf.io.VarLenFeature(tf.float32),
     'image/object/bbox/ymin': tf.io.VarLenFeature(tf.float32),
@@ -82,7 +82,7 @@ IMAGE_FEATURE_MAP = {
 
 
 def parse_tfrecord(tfrecord, class_table, size):
-    x = tf.io.parse_single_example(tfrecord, IMAGE_FEATURE_MAP)
+    x = tf.io.parse_single_example(tfrecord, feature_map)
     x_train = tf.image.decode_jpeg(x['image/encoded'], channels=3)
     x_train = tf.image.resize(x_train, (size, size))
 
