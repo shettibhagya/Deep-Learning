@@ -18,7 +18,7 @@ from tensorflow.keras.regularizers import l2
 from tensorflow.keras.layers import (Add, Concatenate, Conv2D, Input, Lambda, LeakyReLU, MaxPool2D,UpSampling2D, ZeroPadding2D,)
 from tensorflow.keras.losses import (binary_crossentropy, sparse_categorical_crossentropy)
 from .batch_normalization import BatchNormalization
-from .utils import broadcast_iou
+from .utils import iou
 
 """Model Configurations"""
 
@@ -27,10 +27,6 @@ from .utils import broadcast_iou
 yolo_max_boxes = 100
 yolo_iou_threshold = 0.5
 yolo_score_threshold = 0.5
-flags.DEFINE_integer('yolo_max_boxes', 10, 'maximum number of detections at one time')
-flags.DEFINE_float('yolo_iou_threshold', 0.5, 'iou threshold')
-flags.DEFINE_float('yolo_score_threshold', 0.5, 'score threshold')
-
 yolo_anchors = np.array([(10, 13), (16, 30), (33, 23), (30, 61), (62, 45), (59, 119), (116, 90), (156, 198), (373, 326)], np.float32) / 416
 yolo_anchor_masks = np.array([[6, 7, 8], [3, 4, 5], [0, 1, 2]])
 
@@ -57,7 +53,7 @@ def DarknetConv(x, filters, size, strides=1, batch_normalization=True):
 
 """YOLOv3 uses Darknet-53 neural net pretrained on ImageNet for feature extraction. Same as ResNet, Darknet-53 has shortcut (residual) connections, which help information from earlier layers flow further. """
 
-def DarknetResidual(x, filters):
+def DarknetR(x, filters):
     prev = x
     x = DarknetConv(x, filters // 2, 1)
     x = DarknetConv(x, filters, 3)
@@ -67,7 +63,7 @@ def DarknetResidual(x, filters):
 def DarknetBlock(x, filters, blocks):
     x = DarknetConv(x, filters, 3, strides=2)
     for _ in range(blocks):
-        x = DarknetResidual(x, filters)
+        x = DarknetR(x, filters)
     return x
 
 def Darknet(name=None):
@@ -264,14 +260,14 @@ def YoloLoss(anchors, classes=80, ignore_thresh=0.5):
     def yolo_loss(y_true, y_pred):
 
         # 1. Transform all pred outputs
-        # y_pred: (batch_size, grid, grid, anchors, (x, y, w, h, obj, ...cls))
+     
         pred_box, pred_obj, pred_class, pred_xywh = yolo_boxes(
             y_pred, anchors, classes)
         pred_xy = pred_xywh[..., 0:2]
         pred_wh = pred_xywh[..., 2:4]
 
         # 2. Transform all true outputs
-        # y_true: (batch_size, grid, grid, anchors, (x1, y1, x2, y2, obj, cls))
+        
         true_box, true_obj, true_class_idx = tf.split(
             y_true, (4, 1, 1), axis=-1)
         true_xy = (true_box[..., 0:2] + true_box[..., 2:4]) / 2
@@ -279,6 +275,7 @@ def YoloLoss(anchors, classes=80, ignore_thresh=0.5):
         box_loss_scale = 2 - true_wh[..., 0] * true_wh[..., 1]
 
         # 3. Inverting the pred box equations
+        
         grid_size = tf.shape(y_true)[1]
         grid = tf.meshgrid(tf.range(grid_size), tf.range(grid_size))
         grid = tf.expand_dims(tf.stack(grid, axis=-1), axis=2)
@@ -289,6 +286,7 @@ def YoloLoss(anchors, classes=80, ignore_thresh=0.5):
                            tf.zeros_like(true_wh), true_wh)
 
         # 4. Calculate all masks
+        
         obj_mask = tf.squeeze(true_obj, -1)
         # ignore false positive when iou is over threshold
         best_iou = tf.map_fn(
@@ -299,6 +297,7 @@ def YoloLoss(anchors, classes=80, ignore_thresh=0.5):
         ignore_mask = tf.cast(best_iou < ignore_thresh, tf.float32)
 
         # 5. Calculate all losses
+        
         xy_loss = obj_mask * box_loss_scale * \
             tf.reduce_sum(tf.square(true_xy - pred_xy), axis=-1)
         wh_loss = obj_mask * box_loss_scale * \
@@ -307,11 +306,11 @@ def YoloLoss(anchors, classes=80, ignore_thresh=0.5):
         obj_loss = obj_mask * obj_loss + \
             (1 - obj_mask) * ignore_mask * obj_loss
 
-        # TODO: use binary_crossentropy instead in YOLOv3
-        class_loss = obj_mask * sparse_categorical_crossentropy(
-            true_class_idx, pred_class)
+        # We use binary_crossentropy in YOLOv3
+        class_loss = obj_mask * sparse_categorical_crossentropy(true_class_idx, pred_class)
 
-        # 6. Sum over (batch, gridx, gridy, anchors) => (batch, 1)
+        # 6. Sum over all losses
+        
         xy_loss = tf.reduce_sum(xy_loss, axis=(1, 2, 3))
         wh_loss = tf.reduce_sum(wh_loss, axis=(1, 2, 3))
         obj_loss = tf.reduce_sum(obj_loss, axis=(1, 2, 3))
