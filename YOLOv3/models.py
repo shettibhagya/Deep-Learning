@@ -145,7 +145,7 @@ def YoloOutput(filters, anchors, classes, name=None):
     return yolo_output
 
 def yolo_boxes(pred, anchors, classes):
-    # pred: (batch_size, grid, grid, anchors, (x, y, w, h, obj, ...classes))
+   
     grid_size = tf.shape(pred)[1]
     box_xy, box_wh, objectness, class_probs = tf.split(
         pred, (2, 2, 1, classes), axis=-1)
@@ -155,7 +155,7 @@ def yolo_boxes(pred, anchors, classes):
     class_probs = tf.sigmoid(class_probs)
     pred_box = tf.concat((box_xy, box_wh), axis=-1)  # original xywh for loss
 
-    # !!! grid[x][y] == (y, x)
+  
     grid = tf.meshgrid(tf.range(grid_size), tf.range(grid_size))
     grid = tf.expand_dims(tf.stack(grid, axis=-1), axis=2)  # [gx, gy, 1, 2]
 
@@ -221,8 +221,7 @@ def YoloV3(size=None, channels=3, anchors=yolo_anchors, masks=yolo_anchor_masks,
     boxes_2 = Lambda(lambda x: yolo_boxes(x, anchors[masks[2]], classes),
                      name='yolo_boxes_2')(output_2)
 
-    outputs = Lambda(lambda x: yolo_nms(x, anchors, masks, classes),
-                     name='yolo_nms')((boxes_0[:3], boxes_1[:3], boxes_2[:3]))
+    outputs = Lambda(lambda x: yolo_nms(x, anchors, masks, classes),  name='yolo_nms')((boxes_0[:3], boxes_1[:3], boxes_2[:3]))
 
     return Model(inputs, outputs, name='YOLOv3')
 
