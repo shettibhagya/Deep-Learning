@@ -32,12 +32,12 @@ def load_darknet_weights(model, weights_file, tiny=False):
             if not layer.name.startswith('conv2d'):
                 continue
             batch_normalization = None
+            
             if i + 1 < len(sub_model.layers) and \
                     sub_model.layers[i + 1].name.startswith('batch_normalization'):
                 batch_normalization = sub_model.layers[i + 1]
 
             logging.info("{}/{} {}".format(sub_model.name, layer.name, 'bn' if batch_normalization else 'bias'))
-
             filters = layer.filters
             size = layer.kernel_size[0]
             in_dim = layer.input_shape[-1]
@@ -56,8 +56,7 @@ def load_darknet_weights(model, weights_file, tiny=False):
             conv_weights = np.fromfile(
                 wf, dtype=np.float32, count=np.product(conv_shape))
             # tf shape (height, width, in_dim, out_dim)
-            conv_weights = conv_weights.reshape(
-                conv_shape).transpose([2, 3, 1, 0])
+            conv_weights = conv_weights.reshape(conv_shape).transpose([2, 3, 1, 0])
 
             if batch_normalization is None:
                 layer.set_weights([conv_weights, conv_bias])
@@ -85,11 +84,9 @@ def iou(box_1, box_2):
     int_h = tf.maximum(tf.minimum(box_1[..., 3], box_2[..., 3]) -
                        tf.maximum(box_1[..., 1], box_2[..., 1]), 0)
     int_area = int_w * int_h
-    box_1_area = (box_1[..., 2] - box_1[..., 0]) * \
-        (box_1[..., 3] - box_1[..., 1])
-    box_2_area = (box_2[..., 2] - box_2[..., 0]) * \
-        (box_2[..., 3] - box_2[..., 1])
-    return int_area / (box_1_area + box_2_area - int_area)
+    box1_area = (box_1[..., 2] - box_1[..., 0]) * \ (box_1[..., 3] - box_1[..., 1])
+    box2_area = (box_2[..., 2] - box_2[..., 0]) * \(box_2[..., 3] - box_2[..., 1])
+    return int_area / (box1_area + box2_area - int_area)
 
 def draw_outputs(img, outputs, class_names):
     colors = ((np.array(color_palette("hls", 80)) * 255)).astype(np.uint8)
@@ -99,8 +96,8 @@ def draw_outputs(img, outputs, class_names):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = Image.fromarray(img)
     draw = ImageDraw.Draw(img)
-    font = ImageFont.truetype(font='./data/fonts/futur.ttf',
-                              size=(img.size[0] + img.size[1]) // 100)
+    font = ImageFont.truetype(font='./data/fonts/futur.ttf',size=(img.size[0] + img.size[1]) // 100)
+    
     for i in range(nums):
         color = colors[int(classes[i])]
         x1y1 = ((np.array(boxes[i][0:2]) * wh).astype(np.int32))
@@ -111,13 +108,13 @@ def draw_outputs(img, outputs, class_names):
             x1y1[0], x1y1[1] = x1y1[0] - t, x1y1[1] - t
             x2y2[0], x2y2[1] = x2y2[0] - t, x2y2[1] - t
             draw.rectangle([x1y1[0], x1y1[1], x2y2[0], x2y2[1]], outline=tuple(color))
+            
         confidence = '{:.2f}%'.format(objectness[i]*100)
         text = '{} {}'.format(class_names[int(classes[i])], confidence)
         text_size = draw.textsize(text, font=font)
-        draw.rectangle([x0, y0 - text_size[1], x0 + text_size[0], y0],
-                        fill=tuple(color))
-        draw.text((x0, y0 - text_size[1]), text, fill='black',
-                              font=font)
+        draw.rectangle([x0, y0 - text_size[1], x0 + text_size[0], y0],  fill=tuple(color))
+        draw.text((x0, y0 - text_size[1]), text, fill='black',  font=font)
+        
     rgb_img = img.convert('RGB')
     img_np = np.asarray(rgb_img)
     img = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
@@ -135,7 +132,6 @@ def draw_labels(x, y, class_names):
         x1y1 = tuple((np.array(boxes[i][0:2]) * wh).astype(np.int32))
         x2y2 = tuple((np.array(boxes[i][2:4]) * wh).astype(np.int32))
         img = cv2.rectangle(img, x1y1, x2y2, (255, 0, 0), 2)
-        img = cv2.putText(img, class_names[classes[i]],
-                          x1y1, cv2.FONT_HERSHEY_COMPLEX_SMALL,
+        img = cv2.putText(img, class_names[classes[i]], x1y1, cv2.FONT_HERSHEY_COMPLEX_SMALL,
                           1, (0, 0, 0), 2)
     return img
