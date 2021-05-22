@@ -17,7 +17,7 @@ from PIL import Image, ImageDraw, ImageFont
 yolov3 = ['yolo_darknet', 'yolo_conv_0', 'yolo_output_0','yolo_conv_1', 'yolo_output_1', 'yolo_conv_2', 'yolo_output_2',]
 yolov3_tiny = [ 'yolo_darknet','yolo_conv_0', 'yolo_output_0', 'yolo_conv_1', 'yolo_output_1',]
 
-def load_darknet_weights(model, weights_file, tiny=False):
+def darknet_weights(model, weights_file, tiny=False):
     wf = open(weights_file, 'rb')
     major, minor, revision, seen, _ = np.fromfile(wf, dtype=np.int32, count=5)
 
@@ -72,21 +72,21 @@ def load_darknet_weights(model, weights_file, tiny=False):
 def iou(box_1, box_2):
 
     # broadcast boxes
-    box_1 = tf.expand_dims(box_1, -2)
-    box_2 = tf.expand_dims(box_2, 0)
-    # new_shape: (..., N, (x1, y1, x2, y2))
-    new_shape = tf.broadcast_dynamic_shape(tf.shape(box_1), tf.shape(box_2))
-    box_1 = tf.broadcast_to(box_1, new_shape)
-    box_2 = tf.broadcast_to(box_2, new_shape)
+    box1 = tf.expand_dims(box1, -2)
+    box2 = tf.expand_dims(box2, 0)
 
-    int_w = tf.maximum(tf.minimum(box_1[..., 2], box_2[..., 2]) -
-                       tf.maximum(box_1[..., 0], box_2[..., 0]), 0)
-    int_h = tf.maximum(tf.minimum(box_1[..., 3], box_2[..., 3]) -
-                       tf.maximum(box_1[..., 1], box_2[..., 1]), 0)
-    int_area = int_w * int_h
-    box1_area = (box_1[..., 2] - box_1[..., 0]) * \ (box_1[..., 3] - box_1[..., 1])
-    box2_area = (box_2[..., 2] - box_2[..., 0]) * \(box_2[..., 3] - box_2[..., 1])
-    return int_area / (box1_area + box2_area - int_area)
+    new_shape = tf.broadcast_dynamic_shape(tf.shape(box1), tf.shape(box2))
+    box1 = tf.broadcast_to(box1, new_shape)
+    box2 = tf.broadcast_to(box2, new_shape)
+
+    int_w = tf.maximum(tf.minimum(box1[..., 2], box2[..., 2]) -
+                       tf.maximum(box1[..., 0], box2[..., 0]), 0)
+    int_h = tf.maximum(tf.minimum(box1[..., 3], box2[..., 3]) -
+                       tf.maximum(box1[..., 1], box2[..., 1]), 0)
+ 
+    box1_area = (box1[..., 2] - box1[..., 0]) * \ (box1[..., 3] - box1[..., 1])
+    box2_area = (box2[..., 2] - box2[..., 0]) * \(box2[..., 3] - box2[..., 1])
+    return (int_w * int_h) / (box1_area + box2_area - int_area)
 
 def draw_outputs(img, outputs, class_names):
     colors = ((np.array(color_palette("hls", 80)) * 255)).astype(np.uint8)
