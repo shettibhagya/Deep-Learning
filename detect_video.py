@@ -16,14 +16,6 @@ from YOLOv3.models import (YoloV3, YoloV3Tiny)
 from YOLOv3.dataset import transform_images
 from YOLOv3.utils import draw_outputs
 
-flags.DEFINE_string('classes', './data/labels/coco.names', 'path to classes file')
-flags.DEFINE_string('weights', './weights/yolov3.tf', 'path to weights file')
-flags.DEFINE_boolean('tiny', False, 'yolov3 or yolov3-tiny')
-flags.DEFINE_integer('size', 416, 'Image size')
-flags.DEFINE_string('video', './data/video/video1.mp4',  'path to video file or number for webcam)')
-flags.DEFINE_string('output', None, 'path to output video')
-flags.DEFINE_string('output_format', 'XVID', 'saving video to file')
-flags.DEFINE_integer('num_classes', 80, 'number of classes')
 
 def main(_argv):
     physical_devices = tf.config.experimental.list_physical_devices('GPU')
