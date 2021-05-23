@@ -26,8 +26,7 @@ def transform_targets_for_output(y_true, grid_size, anchor_idxs):
         for j in tf.range(tf.shape(y_true)[1]):
             if tf.equal(y_true[i][j][2], 0):
                 continue
-            anchor_eq = tf.equal(
-                anchor_idxs, tf.cast(y_true[i][j][5], tf.int32))
+            anchor_eq = tf.equal(anchor_idxs, tf.cast(y_true[i][j][5], tf.int32))
 
             if tf.reduce_any(anchor_eq):
                 box = y_true[i][j][0:4]
@@ -81,13 +80,12 @@ feature_map = {
 }
 
 
-def parse_tfrecord(tfrecord, class_table, size):
+def ptfrecord(tfrecord, class_table, size):
     x = tf.io.parse_single_example(tfrecord, feature_map)
     x_train = tf.image.decode_jpeg(x['image/encoded'], channels=3)
     x_train = tf.image.resize(x_train, (size, size))
 
-    class_text = tf.sparse.to_dense(
-        x['image/object/class/text'], default_value='')
+    class_text = tf.sparse.to_dense( x['image/object/class/text'], default_value='')
     labels = tf.cast(class_table.lookup(class_text), tf.float32)
     y_train = tf.stack([tf.sparse.to_dense(x['image/object/bbox/xmin']),
                         tf.sparse.to_dense(x['image/object/bbox/ymin']),
@@ -100,17 +98,17 @@ def parse_tfrecord(tfrecord, class_table, size):
 
     return x_train, y_train
 
-def load_tfrecord_dataset(file_pattern, class_file, size=416):
+def tfrecord_dataset(file_pattern, class_file, size=416):
 
     class_table = tf.lookup.StaticHashTable(tf.lookup.TextFileInitializer(
         class_file, tf.string, 0, tf.int64, -1, delimiter="\n"), -1)
 
     files = tf.data.Dataset.list_files(file_pattern)
     dataset = files.flat_map(tf.data.TFRecordDataset)
-    return dataset.map(lambda x: parse_tfrecord(x, class_table, size))
+    return dataset.map(lambda x: ptfrecord(x, class_table, size))
 
 
-def load_fake_dataset():
+def fake_dataset():
     x_train = tf.image.decode_jpeg(open('./data/girl.png', 'rb').read(), channels=3)
     x_train = tf.expand_dims(x_train, axis=0)
 
